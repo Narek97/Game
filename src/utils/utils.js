@@ -3,33 +3,31 @@ import {
     FREE_BOX,
     HOME_ID,
     HOME_WIN_ID,
-    RABBIT_ID, RIP,
+    RABBIT_ID,
     STONE_ID,
     WOLF_ID
 } from "./constants";
 import {moveRabbit} from "./moveRabbit";
 import {moveWoolf} from "./moveWolf";
 
-
-export const movePerson = (gameMatrix, setGameMatrix, STEP_UP) => {
-
-    if (getPersonPosition(gameMatrix, RIP).X === null
-        && getPersonPosition(gameMatrix, HOME_WIN_ID).X === null
+export const movePerson = (gameMatrix, STEP_UP) => {
+    if (getPersonPosition(gameMatrix, RABBIT_ID).X !== null
     ) {
-        moveRabbit(gameMatrix, setGameMatrix, STEP_UP)
-        moveWoolf(gameMatrix, setGameMatrix)
+        moveRabbit(gameMatrix, STEP_UP)
+        return moveWoolf(gameMatrix)
     }
+    return gameMatrix
 }
 
 export const getPersonPosition = (gameMatrix, ID) => {
-    let X = null, Y = null
-    gameMatrix.forEach((el, posX) => {
-        let posY = el.indexOf(ID)
+    let X = null, Y = null, posX = 0
+    while (posX < gameMatrix.length) {
+        let posY = gameMatrix[posX].indexOf(ID)
         if (posY !== -1) {
-            X = posX
-            Y = posY
+            return {X: posX, Y: posY}
         }
-    })
+        posX++
+    }
     return {X, Y}
 }
 
@@ -59,13 +57,9 @@ const getNewBorderPosition = (el, ind, MaxLength) => {
 }
 
 export const getLegalMoves = (allMoves, gameMatrix, ID) => {
-
     for (let i = 0; i < allMoves.length; i++) {
         if (allMoves[i].length === 0
-            || gameMatrix[allMoves[i].X][allMoves[i].Y] === STONE_ID
-            || gameMatrix[allMoves[i].X][allMoves[i].Y] === WOLF_ID
-            || gameMatrix[allMoves[i].X][allMoves[i].Y] === HOME_WIN_ID
-            || gameMatrix[allMoves[i].X][allMoves[i].Y] === ID
+            || isClosePosition(gameMatrix[allMoves[i].X][allMoves[i].Y], ID)
         ) {
             allMoves[i] = CLOSE
         }
@@ -73,15 +67,23 @@ export const getLegalMoves = (allMoves, gameMatrix, ID) => {
     return allMoves
 }
 
-export const changeFieldWithGivenID = (ID, gameMatrix, oldPos, newPos) => {
-    gameMatrix[oldPos.X][oldPos.Y] = FREE_BOX
-    isGameOver(newPos, gameMatrix) ?
-        gameMatrix[newPos.newX][newPos.newY] = ID[0]
-        : gameMatrix[newPos.newX][newPos.newY] = ID[1]
+const isClosePosition = (position, ID) => {
+    const CLOSE_POSITION = [STONE_ID, WOLF_ID, HOME_WIN_ID, ID]
+    return CLOSE_POSITION.some(pos => pos === position)
 }
 
-const isGameOver = (pos, gameMatrix) => {
-    let {newX, newY} = pos
-    return (gameMatrix[newX][newY] === HOME_ID || gameMatrix[newX][newY] === RABBIT_ID)
+export const changeFieldWithGivenID = (ID, gameMatrix, oldPos, newPos) => {
+
+    gameMatrix[oldPos.X][oldPos.Y] = FREE_BOX
+    isGameEnd(newPos, gameMatrix) ?
+        gameMatrix[newPos.newX][newPos.newY] = ID[0]
+        : gameMatrix[newPos.newX][newPos.newY] = ID[1]
+
+}
+
+const isGameEnd = (pos, gameMatrix) => {
+    const {newX, newY} = pos
+
+    return (newX === undefined || gameMatrix[newX][newY] === HOME_ID || gameMatrix[newX][newY] === RABBIT_ID)
 }
 

@@ -11,7 +11,7 @@ export const StartGame = () => {
     const [count, setCount] = useState(DEFAULT_COUNT)
     useEffect(() => {
         startGame(count, setGameMatrix)
-    }, [count,isStart])
+    }, [count, isStart])
 
     return (
         <Styled.Div>
@@ -33,7 +33,6 @@ export const StartGame = () => {
                         </Styled.Button>
                     </div>
             }
-
         </Styled.Div>
     );
 };

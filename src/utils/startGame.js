@@ -16,14 +16,13 @@ export const startGame = (boxCount = 6, setGameMatrix) => {
 }
 
 const createMatrixZeros = (boxCount) => {
-    return new Array(boxCount).fill(0).map(() => new Array(boxCount).fill(0))
+    return new Array(boxCount).fill(0).map(() => new Array(boxCount).fill(FREE_BOX))
 }
 
 const placePersonIntoFreeRandomBox = (matrix, personCount, ID) => {
     Array(personCount).fill(0).forEach(() => {
         const {X, Y} = getFreeRandomPosition(matrix)
         matrix[X][Y] = ID
-
     })
 }
 

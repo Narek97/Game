@@ -7,35 +7,45 @@ import {
     getPersonPosition
 } from "./utils";
 
-export const moveWoolf = (gameMatrix, setGameMatrix) => {
-    let copeMatrix = gameMatrix.map(arr => arr.slice());
-    let RabbitCoordinates = getPersonPosition(gameMatrix, RABBIT_ID)
-
+export const moveWoolf = (gameMatrix) => {
+    const copeMatrix = gameMatrix.map(arr => arr.slice());
+    const RabbitCoordinates = getPersonPosition(gameMatrix, RABBIT_ID)
     gameMatrix.forEach((el, X) => el.forEach((wolf, Y) => {
         if (wolf === WOLF_ID) {
-            let moves = getAllMovesCoordinates(copeMatrix, X, Y)
-            let allMoves = getBorderPosition(moves, copeMatrix.length, WOLF_ID)
-            let LegalMoves = getLegalMoves(allMoves, copeMatrix, HOME_ID)
-            let shortWay = getMostShortestWay(LegalMoves, RabbitCoordinates)
-            const {X: newX, Y: newY} = LegalMoves[shortWay]
+            const moves = getAllMovesCoordinates(copeMatrix, X, Y)
+            const allMoves = getBorderPosition(moves, copeMatrix.length, WOLF_ID)
+            const LegalMoves = getLegalMoves(allMoves, copeMatrix, HOME_ID)
+            const shortWay = getMostShortestWay(LegalMoves, RabbitCoordinates)
+            const {X: newX, Y: newY} = shortWay
+            newX !== undefined &&
             changeFieldWithGivenID([RIP, WOLF_ID], copeMatrix, {X, Y}, {newX, newY})
         }
     }))
-    setGameMatrix(copeMatrix)
+    return copeMatrix
 }
 
 const getMostShortestWay = (wolfCoordinates, rabbitCoordinate) => {
-    const arr = []
+
+    const distances = []
     const {X, Y} = rabbitCoordinate
     wolfCoordinates.forEach(el => {
         el === CLOSE ?
-            arr.push(FAR_AWAY)
-            : arr.push(
-            Math.sqrt(Math.pow(Math.abs((el.X - X) * 2 + 1), 2)
-                * Math.pow(Math.abs((el.Y - Y) * 2 + 1), 2))
+            distances.push(FAR_AWAY)
+            : distances.push(
+            Math.sqrt(Math.pow(Math.abs((el.X - X)), 2)
+                + Math.pow(Math.abs((el.Y - Y)), 2))
             )
-
     })
-    return arr.indexOf(Math.min.apply(null, arr))
+
+    const shortDistanceIndex = distances.reduce((minValueIndex, v, i) => {
+        if (v < distances[minValueIndex]) {
+            return i
+        }
+        return minValueIndex
+    }, 0);
+
+    return wolfCoordinates[shortDistanceIndex]
+
+    // return distances.indexOf(Math.min.apply(null, distances))
 }
 

@@ -24,27 +24,25 @@ export const Frame = ({gameMatrix, setGameMatrix}) => {
 
     const BOX_SIZE = GAME_BORDER_SIZE / gameMatrix.length
     const Identification = url => <img width={BOX_SIZE - 10} src={url} alt="wolf"/>
-
-    useEffect(() => {
-
-        const checkStepCode = (e) => {
-            const CODE = e.code
-            const KEYBOARD = {
-                "ArrowUp": STEP_UP,
-                "ArrowDown": STEP_DOWN,
-                "ArrowRight": STEP_RIGHT,
-                "ArrowLeft": STEP_LEFT,
-            }
-            KEYBOARD[CODE] !== undefined && movePerson(gameMatrix, setGameMatrix, KEYBOARD[CODE])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const checkStepCode = (e) => {
+        const CODE = e.code
+        const KEYBOARD = {
+            "ArrowUp": STEP_UP,
+            "ArrowDown": STEP_DOWN,
+            "ArrowRight": STEP_RIGHT,
+            "ArrowLeft": STEP_LEFT,
         }
+        KEYBOARD[CODE] !== undefined && setGameMatrix([...movePerson(gameMatrix, KEYBOARD[CODE])])
+    }
+    useEffect(() => {
         document.addEventListener("keydown", checkStepCode)
         return () => {
             document.removeEventListener("keydown", checkStepCode);
         };
-    }, [gameMatrix, setGameMatrix])
+    }, [checkStepCode, gameMatrix, setGameMatrix])
 
     return (
-
         <Styled.FrameDiv>
             {
                 gameMatrix.map(el => el.map((e, idx) =>
